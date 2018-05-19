@@ -1,0 +1,144 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "application/javascript": [
+       "if (!(\"Notification\" in window)) {\n",
+       "    alert(\"This browser does not support desktop notifications, so the %%notify magic will not work.\");\n",
+       "} else if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {\n",
+       "    Notification.requestPermission(function (permission) {\n",
+       "        if(!('permission' in Notification)) {\n",
+       "            Notification.permission = permission;\n",
+       "        }\n",
+       "    })\n",
+       "}\n"
+      ],
+      "text/plain": [
+       "<IPython.core.display.Javascript object>"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "%load_ext autoreload\n",
+    "%autoreload 2\n",
+    "\n",
+    "import numpy as np\n",
+    "import tensorflow as tf"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Motivation"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "This is a further development of the idea in [this paper](https://arxiv.org/abs/1707.06626).\n",
+    "Stein algorithm is similar to MCMC, sampling from a given\n",
+    "probability density function (PDF). However, for a higher\n",
+    "accuracy in prediction, only with sampling is not sufficient.\n",
+    "The samples shall be weighted in addition. The weight is gained\n",
+    "from the inference PDF. So, trying to gain the infernece PDF, and\n",
+    "then weighting by it, motives this experiment."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Mathemtatics"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Notation"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Consider a multi-dimensional continous random variable\n",
+    "$X := (X_1, X_2, \\ldots, X_N)$. The PDF is $p(x)$ over\n",
+    "$\\mathbb{R}^N$. Let $z \\sim \\text{Uniform}(D)$ with\n",
+    "$D := (0, 1)^N$. Then, let $f(\\cdot)$ a function\n",
+    "$$f: \\mathbb{R}^N \\mapsto \\mathbb{R}^N$$ (if exists) s.t.\n",
+    "$x = f(z)$ with $z \\sim Z$ generates a sampler of the random\n",
+    "variable $X$, i.e. samples as the PDF $p(x)$."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Theorem"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "$$p\\left( x(z) \\right) = \\left| \\frac{\\partial f}{\\partial z}(z) \\right|^{-1}.$$"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Proof"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Sample $N_s$ samples $\\{z_i: z_i \\sim Z, i = 1, \\ldots, N_s\\}$. In a\n",
+    "given small enough region of $D$, say\n",
+    "$(z_1, z_1 +\\Delta z_1) \\times \\cdots \\times (z_N, z_N +\\Delta z_N)$,\n",
+    "there are $N_s \\prod_i^N \\Delta z_i$ samples. These samples are mapped\n",
+    "to the space of $x$ via $x = f(z)$. The volumn of the region that is mapped\n",
+    "onto can be gained by Jacobian\n",
+    "$$\\Delta x = \\left| \\frac{\\partial f}{\\partial z}(z) \\right| \\Delta z,$$\n",
+    "Thus, the density of the samples is mapped from $N_s$ on the space of $z$\n",
+    "(given by $N_s \\prod_i^N \\Delta z_i / \\prod_j^N \\Delta z_j$) to\n",
+    "$$N_s \\left| \\frac{\\partial f}{\\partial z}(z) \\right|^{-1}$$ on the space\n",
+    "of $x$. Q.E.D."
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.6.1"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
